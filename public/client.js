@@ -6,25 +6,10 @@ window.addEventListener('load', ()=>{
 
     // html element
     const timeshow = document.querySelector('.time')
-    const btn = document.querySelector('.btn')
-    const btn2 = document.querySelector('.btn2')
     const questionshow = document.querySelector('.qus')
     const optionsshow = document.querySelectorAll('.op')
     
     let time = null;
-
-
-
-    btn.addEventListener('click', ()=>{
-        socket.emit('timer')
-        document.querySelector('body').style.backgroundColor = `green`;
-    })
-    
-    btn2.addEventListener('click', ()=>{
-        socket.emit('stopTimer')
-        document.querySelector('body').style.backgroundColor = `yellow`;
-
-    })
 
 
     socket.on('question', (data) => {
@@ -32,12 +17,14 @@ window.addEventListener('load', ()=>{
         // console.log("الخيارات: ", data.options);
         if(data.qus){
             let options = data.options
-            let opCount = 1
             questionshow.innerHTML = `${data.qus}`
-            options.forEach(op => {
-            optionsshow[opCount-1].innerHTML = `${opCount}. ${op.text}`
-            opCount++;
-            });
+            let i = 0
+            optionsshow.forEach( opshow =>{
+                opshow.innerHTML = `${options[i].text}`
+                i++
+            })
+                
+            
         }else{
             questionshow.innerHTML = `[error] no question`
         }
@@ -48,9 +35,25 @@ window.addEventListener('load', ()=>{
         time = data.time
         timeshow.innerHTML = `${time}`;
         if(time == 0){
-            document.querySelector('body').style.backgroundColor = `red`;
+            questionshow.style.backgroundColor = `red`;
         }
     })
     
+
+
+    socket.on('active', (data)=>{
+        socket.emit('stopTimer')
+        console.log(data.answer)
+        if(data.answer){
+            document.querySelector('.qus').style.backgroundColor = `green`
+        }else{
+            document.querySelector('.qus').style.backgroundColor = `red`
+        }
+    })
     
+
+    
+
+    
+
 })

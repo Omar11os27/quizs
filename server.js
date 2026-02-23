@@ -5,6 +5,7 @@ const { Server } = require("socket.io");
 const app = express();
 const server = http.createServer(app); // نربط Express بسيرفر الـ HTTP
 const db = require('./database'); // ملف الاتصال اللي سويناه
+const { error } = require('console');
 
 app.use(express.static("public"));
 // هنا الربط الحقيقي لـ Socket.io مع حل مشكلة الـ CORS
@@ -29,101 +30,105 @@ app.get("/", (req, res) => {
     res.render('home')
 })
 
+app.get("/admin", (req, res) => {
+    res.render('admin')
+})
 
+app.get("/player", (req, res) => {
+    res.render('player')
+})
 
 let time = null;
 let timeInterval = null;
 
+let global = {
+    currectOption: null,
+    timer: false,
+    answer: false
+}
+
 io.on('connection', (socket)=>{
     console.log('new connection', socket.id)
 
-
     let usedQuestions = []; // مصفوفة لتخزين الأسئلة اللي ظهرت
 
+
     async function getNewQuestion() {
-        try {
-            // SQL Query: يجيب سؤال عشوائي مو موجود بالـ usedQuestions
-            const query = `
-                SELECT q.id AS q_id, q.question_text, 
-                    o.id AS o_id, o.option_text, o.is_correct
-                FROM questions q
-                JOIN options o ON q.id = o.question_id
-                WHERE q.id NOT IN (?) 
-                ORDER BY RAND() 
-                LIMIT 4; -- هنا نحدد عدد الخيارات (مثلاً 4)
-            `;
+    try {
+        // 1. نجيب ID مال سؤال واحد عشوائي مو مستخدم
+        const excludeIds = usedQuestions.length > 0 ? usedQuestions : [0];
+        const [questionRow] = await db.query(
+            `SELECT id, question_text FROM questions WHERE id NOT IN (?) ORDER BY RAND() LIMIT 1`,
+            [excludeIds]
+        );
 
-            // إذا المصفوفة فارغة، نمرر [0] حتى لا يضرب الـ Query
-            const excludeIds = usedQuestions.length > 0 ? usedQuestions : [0];
-            
-            const [rows] = await db.query(query, [excludeIds]);
-
-            if (rows.length === 0) {
-                console.log("خلصت كل الأسئلة! راح نصفر القائمة.");
-                usedQuestions = []; // نصفرها إذا خلصت الأسئلة
-                return null;
-            }
-
-            // 1. استخراج نص السؤال
-            const questionId = rows[0].q_id;
-            const questionText = rows[0].question_text;
-
-            // 2. استخراج الاختيارات كلها
-            const options = rows.map(r => ({
-                id: r.o_id,
-                text: r.option_text
-            }));
-
-            // 3. معرفة الخيار الصح (نخزنه بالسيرفر بس)
-            const correctOption = rows.find(r => r.is_correct === 1);
-
-            // إضافة السؤال للقائمة المستخدمة حتى ما يتكرر
-            usedQuestions.push(questionId);
-
-            return {
-                questionId,
-                questionText,
-                options,
-                correctId: correctOption.o_id
-            };
-
-        } catch (err) {
-            console.error("خطأ بجلب السؤال:", err);
+        if (questionRow.length === 0) {
+            console.log("خلصت كل الأسئلة! راح نصفر القائمة.");
+            usedQuestions = []; 
+            return null;
         }
+
+        const questionId = questionRow[0].id;
+        const questionText = questionRow[0].question_text;
+
+        // 2. هسة نجيب الخيارات الخاصة بهذا السؤال حصراً
+        const [optionsRows] = await db.query(
+            `SELECT id, option_text, is_correct FROM options WHERE question_id = ?`,
+            [questionId]
+        );
+
+        // 3. ترتيب البيانات للرجوع
+        const options = optionsRows.map(r => ({
+            id: r.id,
+            text: r.option_text
+        }));
+
+        const correctOption = optionsRows.find(r => r.is_correct === 1);
+
+        usedQuestions.push(questionId);
+
+        return {
+            questionId,
+            questionText,
+            options,
+            correctId: correctOption ? correctOption.id : null
+        };
+
+    } catch (err) {
+        console.error("خطأ بجلب السؤال:", err);
+    }
     }
 
     let question = null;
     async function getqus(){
         question = await getNewQuestion();
-        if (question) {
+        
+        if (question != null) {
             io.emit('question', { qus: question.questionText, options: question.options });
         }else{
-            io.emit('question', { qus: false});
+            // io.emit('question', { qus: false});
         }
+        return await question
     }
-    getqus()
 
-
-
-
-
-
-
-
-
+        
     // Timer
-    socket.on('timer', ()=>{
-        time = 3 //timer value
+    socket.on('timer',async ()=>{
+        global.timer = true
+        question = await getqus()
+        global.currectOption = question.correctId
+        time = 10 //timer value
         clearInterval(timeInterval)
 
         timeInterval = setInterval(() => {
             if(time < 0){
                 clearInterval(timeInterval)
             }else{
-                io.emit('showTime', {time: time})
-                if(time != 0){time--}
+                socket.broadcast.emit('showTime', {time: time})
+                if(time != 0){time--}else{global.timer = false}
             }
         }, 1000);
+
 
     })
 
@@ -131,7 +136,17 @@ io.on('connection', (socket)=>{
         clearInterval(timeInterval)
     })
 
-    
+
+    let Isanswer = false
+    socket.on('answer',(data)=>{
+        if(global.timer && !Isanswer){
+            console.log(data.currentOption == global.currectOption)
+            global.answer = data.currentOption == global.currectOption
+            Isanswer = true
+            io.emit('active',{answer : global.answer})
+        }
+    })
+
 
     socket.on('disconnect', ()=>{
         console.log('disconnect:', socket.id)
