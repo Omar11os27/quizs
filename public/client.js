@@ -6,8 +6,9 @@ window.addEventListener('load', ()=>{
 
     // html element
     const timeshow = document.querySelector('.time')
-    const questionshow = document.querySelector('.qus')
-    const optionsshow = document.querySelectorAll('.op')
+    const questionshow = document.querySelector('.qus .text')
+    const optionsshow = document.querySelectorAll('.op .text')
+    
     
     let time = null;
 
@@ -24,9 +25,8 @@ window.addEventListener('load', ()=>{
                 i++
             })
                 
-            
         }else{
-            questionshow.innerHTML = `[error] no question`
+            questionshow.innerHTML = `خلصت الاسألة`
         }
     });
 
@@ -34,20 +34,32 @@ window.addEventListener('load', ()=>{
     socket.on('showTime', (data)=>{
         time = data.time
         timeshow.innerHTML = `${time}`;
+        if(time <= 5){
+            timeshow.style.color = `red`
+        }
         if(time == 0){
-            questionshow.style.backgroundColor = `red`;
+            document.querySelector('.qus').style.backgroundColor = `red`
+            document.querySelector('.qus .text').innerHTML = `نفذ الوقت`
         }
     })
     
-
+    socket.on('reset', ()=>{
+        document.querySelector('.qus').style.backgroundColor = ``
+        document.querySelector('.qus .text').innerHTML = `السؤال`
+        document.querySelector('.time').style.color = `white`
+        document.querySelector('.time').innerHTML = `20`
+        console.log("[!]reset client")
+    })
 
     socket.on('active', (data)=>{
         socket.emit('stopTimer')
         console.log(data.answer)
         if(data.answer){
             document.querySelector('.qus').style.backgroundColor = `green`
+            document.querySelector('.qus .text').innerHTML = `إجابة صحيحة`
         }else{
             document.querySelector('.qus').style.backgroundColor = `red`
+            document.querySelector('.qus .text').innerHTML = `إجابة خاطئة`
         }
     })
     

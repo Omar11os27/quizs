@@ -35,7 +35,11 @@ app.get("/admin", (req, res) => {
 })
 
 app.get("/player", (req, res) => {
-    res.render('player')
+    if(global.users.length < 2){
+        res.render('player')
+    }else{
+        res.render('maxplayer')
+    }
 })
 
 let time = null;
@@ -44,14 +48,16 @@ let timeInterval = null;
 let global = {
     currectOption: null,
     timer: false,
-    answer: false
+    answer: false,
+    Isanswer: false,
+    users: []
 }
 
 io.on('connection', (socket)=>{
     console.log('new connection', socket.id)
 
     let usedQuestions = []; // مصفوفة لتخزين الأسئلة اللي ظهرت
-
+    
 
     async function getNewQuestion() {
     try {
@@ -106,7 +112,7 @@ io.on('connection', (socket)=>{
         if (question != null) {
             io.emit('question', { qus: question.questionText, options: question.options });
         }else{
-            // io.emit('question', { qus: false});
+            io.emit('question', { qus: false});
         }
         return await question
     }
@@ -136,17 +142,29 @@ io.on('connection', (socket)=>{
         clearInterval(timeInterval)
     })
 
+    socket.on('reset', ()=>{
+        global.Isanswer = false    
+        console.log("[!]reset server")
+        io.emit('reset')
+    })
 
-    let Isanswer = false
+    
     socket.on('answer',(data)=>{
-        if(global.timer && !Isanswer){
+        if(global.timer && !global.Isanswer){
             console.log(data.currentOption == global.currectOption)
             global.answer = data.currentOption == global.currectOption
-            Isanswer = true
+            global.Isanswer = true
             io.emit('active',{answer : global.answer})
         }
     })
 
+    socket.on('player',()=>{
+        console.log('player id = ', socket.id)
+        if(global.users.length < 2){
+            global.users.push(socket.id)
+        }
+        // console.log('[Global ]player ids = ', global.users)
+    })
 
     socket.on('disconnect', ()=>{
         console.log('disconnect:', socket.id)

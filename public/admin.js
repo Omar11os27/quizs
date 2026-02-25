@@ -6,7 +6,10 @@ const btn = document.querySelector('.btn')
 const btn2 = document.querySelector('.btn2')
 
 btn.addEventListener('click', ()=>{
-    socket.emit('timer')
+    socket.emit('reset')
+    // setTimeout(()=>{
+        socket.emit('timer')
+    // },500)
 })
 
 btn2.addEventListener('click', ()=>{

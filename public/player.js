@@ -2,6 +2,8 @@
 // const socket = io(mainPath)
 socket = io()
 
+socket.emit('player')
+
 let btns = document.querySelectorAll('.op')
 let currentOption = null
 
@@ -20,6 +22,11 @@ socket.on('question', (data) => {
         i++
     })
 });
+
+socket.on('reset', ()=>{
+    document.querySelector('.con').style.backgroundColor = `#A433C3`
+    console.log("[!]reset player")
+})
 
 socket.on('active', (data)=>{
     console.log(data.answer)
