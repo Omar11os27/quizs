@@ -7,11 +7,14 @@ const btn2 = document.querySelector('.btn2')
 
 btn.addEventListener('click', ()=>{
     socket.emit('reset')
+    socket.emit('changeRole')
     // setTimeout(()=>{
-        socket.emit('timer')
+    socket.emit('timer')
     // },500)
 })
 
 btn2.addEventListener('click', ()=>{
-    socket.emit('stopTimer')
+    // socket.emit('stopTimer')
+    socket.emit('changeRole')
+
 })

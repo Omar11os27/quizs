@@ -35,11 +35,11 @@ app.get("/admin", (req, res) => {
 })
 
 app.get("/player", (req, res) => {
-    if(global.users.length < 2){
+    // if(global.users.length < 2){
         res.render('player')
-    }else{
-        res.render('maxplayer')
-    }
+    // }else{
+        // res.render('maxplayer')
+    // }
 })
 
 let time = null;
@@ -50,7 +50,11 @@ let global = {
     timer: false,
     answer: false,
     Isanswer: false,
-    users: []
+    users: [],
+    rolePlayer: '2',
+    client: '',
+    pointP1: 0,
+    pointP2: 0,
 }
 
 io.on('connection', (socket)=>{
@@ -110,13 +114,25 @@ io.on('connection', (socket)=>{
         question = await getNewQuestion();
         
         if (question != null) {
-            io.emit('question', { qus: question.questionText, options: question.options });
+            io.emit('question', { qus: question.questionText, options: question.options, role: global.rolePlayer});
         }else{
             io.emit('question', { qus: false});
         }
         return await question
     }
 
+    function changeRole(){
+        if(global.rolePlayer == '1'){
+            global.rolePlayer = '2'
+        }else{
+            global.rolePlayer = '1'
+        }
+    }
+
+    socket.on('changeRole', ()=>{
+        changeRole()
+        console.log('![role] changed Role')
+    })
         
     // Timer
     socket.on('timer',async ()=>{
@@ -154,7 +170,15 @@ io.on('connection', (socket)=>{
             console.log(data.currentOption == global.currectOption)
             global.answer = data.currentOption == global.currectOption
             global.Isanswer = true
-            io.emit('active',{answer : global.answer})
+            socket.emit('active',{answer : global.answer})
+            if(data.playerid == '1'){
+                global.pointP1 += 1
+            }else{
+                global.pointP2 += 1
+            }
+            io.to(global.client).emit('active',{answer : global.answer,pointP1 : global.pointP1, pointP2 : global.pointP2})
+            
+
         }
     })
 
@@ -162,10 +186,15 @@ io.on('connection', (socket)=>{
         console.log('player id = ', socket.id)
         if(global.users.length < 2){
             global.users.push(socket.id)
+            socket.emit('playerId', {playerid : global.users.length})
         }
         // console.log('[Global ]player ids = ', global.users)
     })
 
+    socket.on('client', ()=>{
+        global.client = socket.id
+        console.log('![c] client join')
+    })
     socket.on('disconnect', ()=>{
         console.log('disconnect:', socket.id)
     })

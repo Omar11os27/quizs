@@ -3,6 +3,7 @@ window.addEventListener('load', ()=>{
     // const socket = io(mainPath)
     const socket = io()
 
+    socket.emit('client')
 
     // html element
     const timeshow = document.querySelector('.time')
@@ -57,10 +58,15 @@ window.addEventListener('load', ()=>{
         if(data.answer){
             document.querySelector('.qus').style.backgroundColor = `green`
             document.querySelector('.qus .text').innerHTML = `إجابة صحيحة`
+
+            document.querySelector('.teamA .point').innerHTML = `${data.pointP1}`
+            document.querySelector('.teamB .point').innerHTML = `${data.pointP2}`
         }else{
             document.querySelector('.qus').style.backgroundColor = `red`
             document.querySelector('.qus .text').innerHTML = `إجابة خاطئة`
         }
+
+        
     })
     
 
