@@ -1,11 +1,14 @@
 // const mainPath = "https://watch-party-v2gx.onrender.com";
 // const socket = io(mainPath)
-socket = io()
+// socket = io('http://10.229.50.248:3000')
+const socket = io()
 
 let playerData = {
     playerid: ''
 }
+
 document.querySelector('.lock').style.display = `none`
+
 socket.emit('player')
 socket.on('playerId', (data)=>{
     playerData.playerid = data.playerid
