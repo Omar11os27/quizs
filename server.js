@@ -193,6 +193,8 @@ io.on('connection', (socket)=>{
 
     socket.on('newMatch', ()=>{
         if(!global.isMatch){
+            global.pointP1 = 0
+            global.pointP2 = 0
             global.curQus = 0
             global.numQus = 0
             global.question = []
