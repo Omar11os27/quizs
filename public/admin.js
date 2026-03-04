@@ -5,6 +5,7 @@ const socket = io()
 
 const btn = document.querySelector('.btn')
 const btn2 = document.querySelector('.btn2')
+const newMatch = document.querySelector('.newMatch')
 
 btn.addEventListener('click', ()=>{
     let teamA = document.querySelector('.teamA').value
@@ -19,6 +20,10 @@ btn.addEventListener('click', ()=>{
 
 btn2.addEventListener('click', ()=>{
     socket.emit('stopTimer')
+})
+
+newMatch.addEventListener('click', ()=>{
+    socket.emit('newMatch')
 })
 
 

@@ -72,7 +72,9 @@ let global = {
     curQus: 0,
     numQus: 0,
     qusFull: false,
-    enoughQus: false
+    enoughQus: false,
+    isMatch: true,
+    noQusDatabase: false
 }
 
 io.on('connection', (socket)=>{
@@ -131,6 +133,9 @@ io.on('connection', (socket)=>{
 
      
     async function getqus(){
+        if(global.noQusDatabase){
+            return "DATABASE"
+        }
         let question = null;
         let curQus = global.curQus;
         let qus = null;
@@ -142,13 +147,20 @@ io.on('connection', (socket)=>{
                     global.qusFull = true
                 }
                 qus = await getNewQuestion();
-                global.question.push(qus)
+                if(qus != null){
+                    global.question.push(qus)
+                }else{
+                    global.noQusDatabase = true
+                }
             }
             global.numQus = count+1
         }
+        console.log("global == ", global.question)
         question = global.question[curQus];
         if(global.curQus == global.numQus){
             global.enoughQus = true
+            io.emit('question', {enoughQus: global.enoughQus});
+            return
         }else{
             global.curQus++;
         }
@@ -156,10 +168,12 @@ io.on('connection', (socket)=>{
         // console.log(global.question)
         // console.log(question)
         if (question != null) {
+            console.log("question == ", question)
             io.emit('question', { qus: question.questionText, options: question.options, role: global.rolePlayer, curQus: global.curQus, numQus: global.numQus, enoughQus: global.enoughQus});
-        }else{
-            io.emit('question', { qus: false, enoughQus: global.enoughQus});
         }
+        // else{
+        //     io.emit('question', { qus: false, enoughQus: global.enoughQus});
+        // }
         return await question
     }
 
@@ -171,7 +185,26 @@ io.on('connection', (socket)=>{
         }
     }
 
+    // socket.on('start', ()=>{
+    //     // question
+
+    //     // timer
+    // })
+
+    socket.on('newMatch', ()=>{
+        if(!global.isMatch){
+            global.curQus = 0
+            global.numQus = 0
+            global.question = []
+            global.qusFull = false
+            global.enoughQus = false
+            global.isMatch = true
+            io.emit('toMain')
+        }
+    })
+
     socket.on('endMatch', ()=>{
+        global.isMatch = false
         io.to(global.client).emit('endMatch')
     })
 
@@ -185,10 +218,16 @@ io.on('connection', (socket)=>{
         io.to(global.client).emit('showRole', {role : global.rolePlayer})
         global.timer = true
         question = await getqus()
-        // global.currectOption = question.correctId
+        if(question == "DATABASE"){
+            console.log("[X]no questions in database !!")
+            io.to(global.client).emit('endgame')
+        }
+        if(question != null){
+            global.currectOption = question.correctId
+        }
         time = 10 //timer value
         clearInterval(timeInterval)
-
+        io.to(global.client).emit('timerAnimation')
         timeInterval = setInterval(() => {
             if(time < 0){
                 clearInterval(timeInterval)
@@ -198,7 +237,9 @@ io.on('connection', (socket)=>{
             }
         }, 1000);
     })
+
     socket.on('stopTimer',  ()=>{
+        io.to(global.client).emit('stopTimerAnimation')
         clearInterval(timeInterval)
     })
 

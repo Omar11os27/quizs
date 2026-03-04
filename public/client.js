@@ -49,17 +49,29 @@ window.addEventListener('load', ()=>{
     socket.on('showTime', (data)=>{
         document.querySelector('.countQus').innerHTML = `${clientData.currentQus}/${clientData.numQus}`
         time = data.time
-        timeshow.innerHTML = `${time}`;
+        // timeshow.innerHTML = `${time}`;
+        document.querySelector('.number').innerHTML = `${time}s`
+        
         if(time <= 5){
-            timeshow.style.color = `red`
-            timeshow.style.textShadow = `1px 1px 10px red`
+            document.querySelector('.number').style.color = `red`
         }
         if(time == 0){
             document.querySelector('.qus').style.backgroundColor = `red`
             document.querySelector('.qus .text').innerHTML = `نفذ الوقت`
             document.querySelector('.qus .text').style.textShadow = `1px 1px 10px red`
-
         }
+    })
+
+    socket.on('timerAnimation', ()=>{
+        document.querySelector('.progress').style.animationPlayState = 'running';
+        document.querySelector('.progress').classList.remove('move')
+        setTimeout(()=>{
+            document.querySelector('.progress').classList.add('move')
+        },100)
+    })
+
+    socket.on('stopTimerAnimation',()=>{
+        document.querySelector('.progress').style.animationPlayState = 'paused';
     })
 
     // questions
@@ -72,7 +84,7 @@ window.addEventListener('load', ()=>{
             if(data.qus.length > 50){
                 document.querySelector('.qus .text').style.fontSize = `32px`
             }
-                console.log(data.qus.length)
+                // console.log(data.qus.length)
             questionshow.innerHTML = `${data.qus}`
             let i = 0
             optionsshowtext.forEach( opshow =>{
@@ -94,16 +106,16 @@ window.addEventListener('load', ()=>{
     socket.on('endMatch', async()=>{
         clientData.endMatch = true
         socket.emit('stopTimer')
-        socket.emit('reset')
+        // socket.emit('reset')
+        window.location.href = '/result'
     })
     
     socket.on('reset', ()=>{
         document.querySelector('.qus .text').innerHTML = `السؤال`
         document.querySelector('.qus').style.backgroundColor = `white`
         document.querySelector('.qus .text').style.textShadow = `1px 1px 10px white`
-        document.querySelector('.time').style.textShadow = `1px 1px 10px yellow`
-        document.querySelector('.time').style.color = `white`
-        document.querySelector('.time').innerHTML = `20`
+        document.querySelector('.number').innerHTML = `10s`
+        document.querySelector('.number').style.color = `white`
         document.querySelector(`.op${clientData.opId} .bgop`).style.backgroundColor = `#925353`
         document.querySelectorAll('.team .role').forEach(r => r.style.opacity = `0%`)
         document.querySelectorAll('.teamicon').forEach(t =>{ 
@@ -111,9 +123,7 @@ window.addEventListener('load', ()=>{
             t.style.boxShadow = `1px 1px 20px white`
         })
         
-            
-
-
+        
 
 
         console.log("[!]reset client")
@@ -140,7 +150,9 @@ window.addEventListener('load', ()=>{
     })
     
 
-    
+    socket.on('endgame', ()=>{
+        console.log("end game")
+    })
 
     socket.on('setTeam', data =>{
         document.querySelector('.teamA .name').innerHTML = `${data.teamA}`
