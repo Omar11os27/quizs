@@ -183,11 +183,6 @@ io.on('connection', (socket)=>{
         }
     }
 
-    // socket.on('start', ()=>{
-    //     // question
-
-    //     // timer
-    // })
 
     socket.on('newMatch', ()=>{
         if(!global.isMatch){
