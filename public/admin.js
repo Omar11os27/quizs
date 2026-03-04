@@ -12,9 +12,9 @@ btn.addEventListener('click', ()=>{
     let teamB = document.querySelector('.teamB').value
     socket.emit('setTeam', {teamA: teamA, teamB: teamB})
     socket.emit('reset')
-    socket.emit('changeRole')
+    // socket.emit('changeRole')
     // setTimeout(()=>{
-    socket.emit('timer')
+    socket.emit('startQus')
     // },500)
 })
 
