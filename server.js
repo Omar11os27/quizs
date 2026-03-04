@@ -129,7 +129,9 @@ io.on('connection', (socket)=>{
         }
     }
 
+    
 
+     
     async function getqus(){
         if(global.noQusDatabase){
             return "DATABASE"
@@ -153,7 +155,7 @@ io.on('connection', (socket)=>{
             }
             global.numQus = count+1
         }
-        // console.log("global == ", global.question)
+        console.log("global == ", global.question)
         question = global.question[curQus];
         if(global.curQus == global.numQus){
             global.enoughQus = true
@@ -166,7 +168,7 @@ io.on('connection', (socket)=>{
         // console.log(global.question)
         // console.log(question)
         if (question != null) {
-            // console.log("question == ", question)
+            console.log("question == ", question)
             io.emit('question', { qus: question.questionText, options: question.options, role: global.rolePlayer, curQus: global.curQus, numQus: global.numQus, enoughQus: global.enoughQus});
         }
         // else{
@@ -202,15 +204,34 @@ io.on('connection', (socket)=>{
     })
 
     socket.on('changeRole', ()=>{
-        // changeRole()
+        changeRole()
         console.log('![role] changed Role')
     })
         
     // Timer
-    // socket.on('timer',async ()=>{
-        
-        
-    // })
+    socket.on('timer',async ()=>{
+        io.to(global.client).emit('showRole', {role : global.rolePlayer})
+        global.timer = true
+        question = await getqus()
+        if(question == "DATABASE"){
+            console.log("[X]no questions in database !!")
+            io.to(global.client).emit('endgame')
+        }
+        if(question != null){
+            global.currectOption = question.correctId
+        }
+        time = 10 //timer value
+        clearInterval(timeInterval)
+        io.to(global.client).emit('timerAnimation')
+        timeInterval = setInterval(() => {
+            if(time < 0){
+                clearInterval(timeInterval)
+            }else{
+                socket.broadcast.emit('showTime', {time: time})
+                if(time != 0){time--}else{global.timer = false}
+            }
+        }, 1000);
+    })
 
     socket.on('stopTimer',  ()=>{
         io.to(global.client).emit('stopTimerAnimation')
@@ -256,6 +277,11 @@ io.on('connection', (socket)=>{
         console.log('![c] client join')
     })
 
+    socket.on('disconnect', ()=>{
+        console.log('disconnect:', socket.id)
+    })
+
+
 
 
 
@@ -277,12 +303,4 @@ io.on('connection', (socket)=>{
         io.to(global.client).emit('setTeam', {teamA: data.teamA, teamB: data.teamB})
     })
     // setTeam
-
-
-
-
-
-    socket.on('disconnect', ()=>{
-        console.log('disconnect:', socket.id)
-    })
 })
