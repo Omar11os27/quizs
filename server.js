@@ -7,6 +7,7 @@ const server = http.createServer(app); // نربط Express بسيرفر الـ H
 const db = require('./database'); // ملف الاتصال اللي سويناه
 const { error } = require('console');
 const { emit } = require('cluster');
+const { json } = require('stream/consumers');
 
 app.use(express.static("public"));
 // هنا الربط الحقيقي لـ Socket.io مع حل مشكلة الـ CORS
@@ -19,7 +20,7 @@ const io = new Server(server, {
 
 const port = 3000
 // start server
-// ipv4 10.229.50.248(cmd ipconfig)
+// ipv4 10.229.50.248 (cmd ipconfig)
 server.listen(port,'0.0.0.0', () => {
     console.log(`listening on port ${port}`)
 })
@@ -54,6 +55,13 @@ app.get("/player", (req, res) => {
         // res.render('maxplayer')
     // }
 })
+app.get("/wait", (req, res) => {
+    res.render('wait')
+})
+app.get("/welcome", (req, res) => {
+    res.render('welcome')
+})
+
 
 let time = null;
 let timeInterval = null;
@@ -70,12 +78,94 @@ let global = {
     pointP2: 0,
     question: [],
     curQus: 0,
-    numQus: 0,
+    numQus: 3,
     qusFull: false,
     enoughQus: false,
     isMatch: true,
-    noQusDatabase: false
+    noQusDatabase: false,
+    matchs: [],
+    teams: [],
+    curMatchId: 0
 }
+
+//functions
+        
+    // team
+    async function getTeams(){
+        let res = await db.query(`select * from teams`)
+        return res
+    }
+    //
+
+    // matchs
+    async function getMatchs(){
+        let res = await db.query("select * from quiz_matches order by match_order")
+        return res
+    }
+
+    async function setMT() {
+        let m = await getMatchs()
+        global.matchs = m[0]
+        let t = await getTeams()
+        global.teams = t[0]
+    }
+
+    // setMT()
+
+    function getMatch(){
+        let matchs = global.matchs
+        let cur = matchs.filter(m => m.match_status == 'pending')
+        return cur
+    }
+
+    function getTeam(a,b){
+        let team = global.teams
+        
+        let teamA = team.filter(t => t.id == a)
+        let teamB = team.filter(t => t.id == b)
+        
+        return{
+            teamA: teamA[0],
+            teamB: teamB[0]
+        }
+    }
+
+    async function finishMatch(id){
+        if(id != 0){
+            await db.query(`update quiz_matches set match_status = 'finished' where id = ${id}`)
+        }
+    }
+
+    function curMatch() {
+        let m = getMatch()
+        m = m[0]
+        
+        if(m != null){
+            let t = getTeam(m.teamA_id, m.teamB_id)
+            let ta = t.teamA
+            let tb = t.teamB
+            global.curMatchId = m.id
+            
+            return{
+                teamA: ta,
+                teamB: tb
+            }
+        }else{
+            return null
+        }
+    }
+
+    function changeRole(){
+        // if(global.isMatch == false) return
+
+        if(global.rolePlayer == '1'){
+            global.rolePlayer = '2'
+        }else{
+            global.rolePlayer = '1'
+        }
+    }
+// 
+
 
 io.on('connection', (socket)=>{
     console.log('new connection', socket.id)
@@ -84,6 +174,8 @@ io.on('connection', (socket)=>{
     
 
     async function getNewQuestion() {
+        if(global.isMatch == false) return
+
         try {
             // 1. نجيب ID مال سؤال واحد عشوائي مو مستخدم
             const excludeIds = usedQuestions.length > 0 ? usedQuestions : [0];
@@ -129,9 +221,6 @@ io.on('connection', (socket)=>{
         }
     }
 
-    
-
-     
     async function getqus(){
         if(global.noQusDatabase){
             return "DATABASE"
@@ -155,7 +244,7 @@ io.on('connection', (socket)=>{
             }
             global.numQus = count+1
         }
-        console.log("global == ", global.question)
+        // console.log("global == ", global.question)
         question = global.question[curQus];
         if(global.curQus == global.numQus){
             global.enoughQus = true
@@ -164,46 +253,42 @@ io.on('connection', (socket)=>{
         }else{
             global.curQus++;
         }
-        // console.log("numQus: ",global.numQus,"  curQus",global.curQus)
-        // console.log(global.question)
-        // console.log(question)
+
         if (question != null) {
-            console.log("question == ", question)
-            io.emit('question', { qus: question.questionText, options: question.options, role: global.rolePlayer, curQus: global.curQus, numQus: global.numQus, enoughQus: global.enoughQus});
+            // console.log("question == ", question)
+            io.emit('question', { qus: question.questionText, 
+                options: question.options, 
+                role: global.rolePlayer, 
+                curQus: global.curQus, 
+                numQus: global.numQus, 
+                enoughQus: global.enoughQus});
         }
-        // else{
-        //     io.emit('question', { qus: false, enoughQus: global.enoughQus});
-        // }
+        
         return await question
     }
-
-    function changeRole(){
-        if(global.rolePlayer == '1'){
-            global.rolePlayer = '2'
-        }else{
-            global.rolePlayer = '1'
-        }
-    }
+    
+    
 
 
     socket.on('newMatch', ()=>{
-        if(!global.isMatch){
+        // if(!global.isMatch){
+            console.log('new match')
             global.pointP1 = 0
             global.pointP2 = 0
             global.curQus = 0
-            global.numQus = 0
+            global.numQus = 3
             global.question = []
             global.qusFull = false
             global.enoughQus = false
-            global.isMatch = true
-            io.emit('toMain')
-        }
+            // global.isMatch = true
+            io.emit('newMatch')
+        // }
     })
 
-    socket.on('endMatch', ()=>{
-        global.isMatch = false
-        io.to(global.client).emit('endMatch')
-    })
+    // socket.on('endMatch', ()=>{
+    //     global.isMatch = false
+    //     // io.emit('endMatch')
+    // })
 
     socket.on('changeRole', ()=>{
         changeRole()
@@ -212,19 +297,24 @@ io.on('connection', (socket)=>{
         
     // Timer
     socket.on('timer',async ()=>{
-        io.to(global.client).emit('showRole', {role : global.rolePlayer})
+        io.emit('showRole', {role : global.rolePlayer})
+
         global.timer = true
         question = await getqus()
         if(question == "DATABASE"){
             console.log("[X]no questions in database !!")
-            io.to(global.client).emit('endgame')
+            // io.emit('endgame')
         }
         if(question != null){
             global.currectOption = question.correctId
         }
+
+        let cur = curMatch()
+        io.emit('setMatch',{teamA: cur.teamA, teamB: cur.teamB})
+
         time = 10 //timer value
         clearInterval(timeInterval)
-        io.to(global.client).emit('timerAnimation')
+        io.emit('timerAnimation')
         timeInterval = setInterval(() => {
             if(time < 0){
                 clearInterval(timeInterval)
@@ -233,13 +323,13 @@ io.on('connection', (socket)=>{
                 if(time != 0){time--}else{global.timer = false}
             }
         }, 1000);
+
     })
 
     socket.on('stopTimer',  ()=>{
-        io.to(global.client).emit('stopTimerAnimation')
+        io.emit('stopTimerAnimation')
         clearInterval(timeInterval)
     })
-
 
 
     socket.on('reset', ()=>{
@@ -253,7 +343,7 @@ io.on('connection', (socket)=>{
         if(global.timer && !global.Isanswer){
             global.answer = data.currentOption == global.currectOption
             global.Isanswer = true
-            socket.emit('active',{answer : global.answer})
+            // socket.emit('active',{answer : global.answer})
             if(global.answer == true){
                 if(data.playerid == '1'){
                     global.pointP1 += 1
@@ -261,7 +351,7 @@ io.on('connection', (socket)=>{
                     global.pointP2 += 1
                 }
             }
-            io.to(global.client).emit('active',{answer : global.answer, pointP1 : global.pointP1, pointP2 : global.pointP2, opId: data.currentOption})
+            io.emit('active',{answer : global.answer, pointP1 : global.pointP1, pointP2 : global.pointP2, opId: data.currentOption})
         }
     })
 
@@ -291,18 +381,22 @@ io.on('connection', (socket)=>{
 
 
 
-    // setTeam
-    async function getOp(){
-        let res = await db.query("select * from teams")
-        return res
-    }
-    socket.on('getOp', async ()=>{
-        let res = await getOp()
-        socket.emit('getOp', {res : res})
+// wait before start match
+    socket.on('wait', ()=>{
+        setMT()
+        if(global.curQus != global.numQus){
+            io.emit('wait')
+        }else{
+            // finishMatch(global.curMatchId)
+            io.emit('endMatch')
+        }
+    })
+    socket.on('waitFinsh' ,()=>{
+        io.emit('waitFinsh')
     })
 
-    socket.on('setTeam', data =>{
-        io.to(global.client).emit('setTeam', {teamA: data.teamA, teamB: data.teamB})
-    })
-    // setTeam
-})
+    
+    
+})//end connection
+
+

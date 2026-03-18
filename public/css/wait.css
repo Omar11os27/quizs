@@ -1,0 +1,101 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+:root{
+    --col1: #4A2828;
+    --col2: #DBDBDB;
+    --bgcol1: #B99493;
+    --bgcol2: #5F3A33;
+    --fontcol: #F3E6D0;
+}
+.con{
+    width: 100%;
+    height: 100vh;
+    background-image: linear-gradient( to right bottom,var(--bgcol1), var(--bgcol2));
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.main{
+    margin-top: 160px;
+}
+
+.text{
+    color: var(--fontcol);
+}
+
+.time{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: absolute;
+    left: 160px;
+}
+.text1{
+    font-size: 36px;
+    margin-bottom: 40px;
+}
+.timer{
+    width: 270px;
+    height: 75px;
+    background-color: var(--col1);
+    border: 3px solid var(--col2);
+    border-radius: 20px;
+}
+.timeText{
+    font-size: 48px;
+}
+
+.team{
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    position: absolute;
+    right: 104px;
+}
+.logoTeam{
+    width: 200px;
+    height: 200px;
+    background-color: #7C5F5F;
+    border-radius: 50%;
+}
+.text2{
+    font-size: 64px;
+    margin-bottom: 40px;
+}
+.nameTeam{
+    font-size: 36px;
+}
+
+
+
+
+.center{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* shapes */
+.shape{
+    width: 100%;
+}
+.bgShape{
+    width: 630px;
+    height: 350px;
+    position: absolute;
+    z-index: 1;
+    bottom: 0;
+    right: 0;
+    /* border: 1px solid red; */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.bgShape img{
+    width: 100%;
+    opacity: 38%;
+}

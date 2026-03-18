@@ -3,40 +3,97 @@
     padding: 0;
     box-sizing: border-box;
 }
-
-.con{
+:root{
+    --col1: #4A2828;
+    --col2: #DBDBDB;
+    --bgcol1: #B99493;
+    --bgcol2: #5F3A33;
+    --fontcol: #F3E6D0;
+}
+.quscon{
+    /* transform: translateY(); */
     width: 100%;
     height: 100vh;
-    background-color: #A433C3;
+    background-image: linear-gradient( to right bottom,var(--bgcol1), var(--bgcol2));
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    /* justify-content: center; */
     align-items: center;
+    /* overflow: hidden; */
 }
-.options{
+
+.qus{
+    position: relative;
+    margin: 20px 0 20px 0;
+    width: 900px;
+    height: 100px;
+    background-color: var(--col2);
+    z-index: 1;
+}
+
+.bgqus{
+    width: 98%;
+    height: 90%;
+    background-color: var(--col1);
+    padding: 0 40px;
+}
+.text{
+    text-align: center;
+    font-size: 36px;
+    color: var(--fontcol);
+    text-shadow: 1px 1px 20px;
+}
+
+.ops{
     width: 90%;
-    /* padding: 10px; */
-    border-radius: 40px;
-    /* transform: translateY(10vh); */
-    /* background-color: red; */
     display: grid;
     grid-template-columns: auto auto;
+    z-index: 10;
+    /* border: 1px solid red; */
     justify-content: center;
+    margin-top: 20px;
+    gap: 20px 100px;
 }
+
 .op{
     width: 400px;
     height: 80px;
-    color: #A433C3;
-    background-color: white;
-    border-radius: 40px;
-    margin: 20px 40px;
     font-size: 42px;
+    text-align: center;
+    background-color: var(--col2);
+}
+.bgop{
+    width: 97%;
+    height: 90%;
+    background-color: var(--col1);
+}
+.center{
     display: flex;
     justify-content: center;
     align-items: center;
 }
+.clip{
+    clip-path: polygon(5% 0%, 95% 0%, 99% 50%, 95% 100%, 5% 100%, 1% 50%);
+}
+
+.countQus{
+    width: 120px;
+    height: 40px;
+    border-radius: 30px;
+    font-size: 28px;
+    font-weight: bold;
+    color: var(--fontcol);
+    background-color: var(--col1);
+    border: 2px solid var(--col2);
+    text-shadow: 1px 1px 20px;
+    /* position: absolute; */
+    /* top: 15%; */
+    margin-top: 2%;
+}
+
 
 .lock{
-    display: none;
+    /* display: none; */
     width: 100%;
     height: 100vh;
     position: absolute;
@@ -46,11 +103,86 @@
     justify-content: center;
     align-items: center;
     background-color: rgba(99, 0, 0, 0.7);
+    z-index: 9999;
 }
 .lock > p{
     font-size: 62px;
     color: red;
     background-color: white;
+    text-shadow: 1px 1px 20px;
     border-radius: 40px;
-    padding: 10px;
+    padding: 20px;
+}
+
+/* -------timer--------- */
+.conTimer{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100px;
+  /* border: 1px red solid; */
+}
+
+.progress {
+    /* stroke-dasharray = 2*r*3.14  */
+    stroke-dasharray: 285; 
+    stroke-dashoffset: 0; /* هنا مخفية تماماً */
+    stroke: #925353;
+    stroke-linecap: round; /* يسوي حواف الدائرة دائرية ومرتبة */
+    transform: rotate(-90deg); /* يخليها تبدي من فوك */
+    transform-origin: center;
+  
+}
+
+.move{
+  animation: fillProgress 20s linear forwards;
+}
+@keyframes fillProgress {
+  to {
+    stroke-dashoffset: 285; /* هنا تصير الدائرة كاملة */
+  }
+}
+.number{
+  position: absolute;
+  font-size: 30px;
+  font-weight: bold;
+  color: #55F068;
+  text-shadow: 1px 1px 20px;
+}
+.timerShadow {
+  filter: drop-shadow(1px 1px 10px white);
+}
+.timerFill{
+    fill: var(--col1);
+}
+
+
+/* shapes */
+.shape{
+    width: 100%;
+}
+.bgShape{
+    width: 630px;
+    height: 350px;
+    position: absolute;
+    z-index: 1;
+    bottom: 0;
+    right: 0;
+    /* border: 1px solid red; */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.bgShape img{
+    width: 100%;
+    opacity: 38%;
+}
+
+/* result iframe */
+.resPage{
+    /* display: none; */
+    position: absolute;
+    width: 100%;
+    height: 100vh;
+    z-index: 999;
 }

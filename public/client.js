@@ -1,7 +1,10 @@
+// const { emit } = require("../database")
+
 window.addEventListener('load', ()=>{
+    
     // const mainPath = "https://watch-party-v2gx.onrender.com";
     // const socket = io(mainPath)
-    // const socket = io('http://10.229.50.248:3000')
+    // const socket = io('http://10.143.115.248:3000')
     const socket = io()
 
     socket.emit('client')
@@ -20,26 +23,21 @@ window.addEventListener('load', ()=>{
         endMatch: false
     }
 
-    socket.on('showRole', (data)=>{
-        // console.log('roled!!')
-        if(clientData.endMatch){
-            return
-        }
 
+    socket.on('showRole', (data)=>{
+        // if(clientData.endMatch) return
+        console.log('changed role!!')
         if(data.role == '1'){
-            document.querySelector('.teamA .role').style.opacity = `100%`
-            document.querySelector('.teamB .role').style.opacity = `0%`
-            document.querySelector('.teamAicon').style.border = `green 2px solid`
-            document.querySelector('.teamBicon').style.border = ``
-            document.querySelector('.teamAicon').style.boxShadow = `1px 1px 20px green`
-            document.querySelector('.teamBicon').style.boxShadow = `1px 1px 20px white`
+            document.querySelector('.teamA').style.backgroundColor = `green`
+            document.querySelector('.teamB').style.backgroundColor = `#4A2828`
+            document.querySelector('.teamAicon').style.display = ``
+            document.querySelector('.teamBicon').style.display = `none`
         }else{
-            document.querySelector('.teamB .role').style.opacity = `100%`
-            document.querySelector('.teamA .role').style.opacity = `0%`
-            document.querySelector('.teamBicon').style.border = `green 2px solid`
-            document.querySelector('.teamAicon').style.border = ``
-            document.querySelector('.teamBicon').style.boxShadow = `1px 1px 20px green`
-            document.querySelector('.teamAicon').style.boxShadow = `1px 1px 20px white`
+            document.querySelector('.teamB').style.backgroundColor = `green`
+            document.querySelector('.teamA').style.backgroundColor = `#4A2828`
+            document.querySelector('.teamBicon').style.display = ``
+            document.querySelector('.teamAicon').style.display = `none`
+
         }
     })
 
@@ -47,9 +45,9 @@ window.addEventListener('load', ()=>{
     // timer
     let time = null;
     socket.on('showTime', (data)=>{
-        document.querySelector('.countQus').innerHTML = `${clientData.currentQus}/${clientData.numQus}`
+        if(clientData.endMatch) return
+
         time = data.time
-        // timeshow.innerHTML = `${time}`;
         document.querySelector('.number').innerHTML = `${time}s`
         
         if(time <= 5){
@@ -76,9 +74,10 @@ window.addEventListener('load', ()=>{
 
     // questions
     socket.on('question', (data) => {
-        clientData.currentQus = data.curQus
-        clientData.numQus = data.numQus
-        // data.qus && 
+        // if(clientData.endMatch) return
+
+        document.querySelector('.countQus').innerHTML = `${data.curQus}/${data.numQus}`
+
         if(!data.enoughQus){
             let options = data.options
             if(data.qus.length > 50){
@@ -103,26 +102,14 @@ window.addEventListener('load', ()=>{
         }
     });
 
-    socket.on('endMatch', async()=>{
-        clientData.endMatch = true
-        socket.emit('stopTimer')
-        // socket.emit('reset')
-        window.location.href = '/result'
-    })
     
     socket.on('reset', ()=>{
         document.querySelector('.qus .text').innerHTML = `السؤال`
-        document.querySelector('.qus').style.backgroundColor = `white`
-        document.querySelector('.qus .text').style.textShadow = `1px 1px 10px white`
-        document.querySelector('.number').innerHTML = `10s`
-        document.querySelector('.number').style.color = `white`
-        document.querySelector(`.op${clientData.opId} .bgop`).style.backgroundColor = `#925353`
-        document.querySelectorAll('.team .role').forEach(r => r.style.opacity = `0%`)
-        document.querySelectorAll('.teamicon').forEach(t =>{ 
-            t.style.border = ``
-            t.style.boxShadow = `1px 1px 20px white`
-        })
-        
+        document.querySelector('.qus').style.backgroundColor = `#DBDBDB`
+        document.querySelectorAll('.text').forEach(text =>{text.style.textShadow = `1px 1px 20px #F3E6D0`})
+        document.querySelector('.number').innerHTML = `20s`
+        document.querySelector('.number').style.color = `#55F068`
+        document.querySelectorAll(`.op .bgop`).forEach(op => {op.style.backgroundColor = `#4A2828`})
         
 
 
@@ -132,7 +119,7 @@ window.addEventListener('load', ()=>{
     socket.on('active', (data)=>{
         clientData.opId = data.opId
         socket.emit('stopTimer')
-        // console.log(data.answer)
+
         if(data.answer){
             document.querySelector(`.op${clientData.opId} .bgop`).style.backgroundColor = `#329e32`
             document.querySelector('.qus .text').innerHTML = `إجابة صحيحة 1+`
@@ -154,9 +141,47 @@ window.addEventListener('load', ()=>{
         console.log("end game")
     })
 
-    socket.on('setTeam', data =>{
-        document.querySelector('.teamA .name').innerHTML = `${data.teamA}`
-        document.querySelector('.teamB .name').innerHTML = `${data.teamB}`
+    socket.on('setMatch', (data) =>{
+        let teamA = data.teamA
+        let teamB = data.teamB
+        document.querySelector('.teamA .name').innerHTML = `${teamA.team_name}`
+        document.querySelector('.teamB .name').innerHTML = `${teamB.team_name}`
     })
+
+
+    const iframe = document.querySelector('.Page')
+    socket.on('endMatch', ()=>{
+        socket.emit('stopTimer')
+        document.querySelector('.quscon').style.display = `none`
+        iframe.contentWindow.location.href = `result`
+        iframe.style.display = `block`
+    })
+
+    // socket.on('endMatch', async()=>{
+    //     // clientData.endMatch = true
+    //     socket.emit('stopTimer')
+    //     // socket.emit('reset')
+    //     document.querySelector('.quscon').style.display = `none`
+    //     iframe.contentWindow.location.href = `result`
+    //     // iframe.contentWindow.location.reload();
+    //     iframe.style.display = `block`
+    // })
+    socket.on('newMatch', (data)=>{
+        iframe.contentWindow.location.href = `match`
+    })
+
+
+    // wait page before start match
+    socket.on('wait', ()=>{
+        document.querySelector('.quscon').style.display = `none`
+        iframe.contentWindow.location.href = `wait`
+        iframe.style.display = `block`
+    })
+    socket.on('waitFinsh', ()=>{
+        iframe.contentWindow.location.href = ``
+        iframe.style.display = `none`
+        document.querySelector('.quscon').style.display = ``
+    })
+
 
 })

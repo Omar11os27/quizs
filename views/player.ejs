@@ -7,14 +7,54 @@
     <title>Document</title>
 </head>
 <body>
-    <div class="con">
-        <div class="options">
-            <div class="lock"><p>Can't Play</p></div>
-            <div class="op" data-id="1">1</div>
-            <div class="op" data-id="2">2</div>
-            <div class="op" data-id="3">3</div>
-            <div class="op" data-id="4">4</div>
-        </div>
+    <iframe class="resPage"></iframe>
+    <div class="lock"><p>انتظر دورك</p></div>
+    <div class="quscon">
+
+            <div class="countQus center">1/10</div>
+
+            <div class="qus clip center">
+                <div class="bgqus clip center">
+                    <p class="text center">السؤال</p>
+                </div>
+            </div>
+
+            <div class="conTimer">
+                <svg width="150" height="150">
+                    <circle class="timerShadow" cx="75" cy="75" r="50" stroke="#fff" stroke-width="6" fill="none" />
+            
+                    <circle cx="75" cy="75" r="45" stroke="#A88780" stroke-width="10" fill="none" class="timerFill"/>
+            
+                    <circle class="progress" cx="75" cy="75" r="45" stroke="#925353" stroke-width="10" fill="none" />
+                </svg>
+                <div class="number">20s</div>
+            </div>
+
+            <div class="ops">
+                <div class="op clip center" data-id="1">
+                    <div class="bgop clip center">
+                        <span class="text">الخيار الاول</span>
+                    </div>
+                </div>  
+                <div class="op clip center" data-id="2">
+                    <div class="bgop clip center">
+                        <span class="text">الخيار الثاني</span>
+                    </div>
+                </div>
+                <div class="op clip center" data-id="3">
+                    <div class="bgop clip center">
+                        <span class="text">الخيار الثالث</span>
+                    </div>
+                </div>
+                <div class="op clip center" data-id="4">
+                    <div class="bgop clip center">
+                        <span class="text">الخيار الرابع</span>
+                    </div>
+                </div>
+            </div>
+            <!-- shapes -->
+        <div class="bgShape"><img src="/img/bgShape.png" alt="bgShape"></div>
+        
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
