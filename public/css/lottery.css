@@ -7,6 +7,8 @@
 :root{
     --bg: #925353;
     --font: white;
+    --lineWeght: 5px;
+    --lineColor: white;
 }
 .con{
     position: relative;
@@ -61,3 +63,137 @@
     width: 100%;
 }
 
+
+
+
+.matchs{
+    height: 100vh;
+    /* border: 1px solid red; */
+    position: absolute;
+    right: 15%;
+    z-index: 999;
+}
+.matchs2{   
+    right: 35%;
+}
+
+.matchs3{
+    right: 56%;
+}
+
+.matchs4{
+    right: 80%;
+}
+
+.match{
+    width: 180px;
+    height: 40px;
+    background-color: #925353;
+    border: 1px solid white;
+    border-radius: 20px;
+    position: absolute;
+    top: 5%;
+}
+
+.match2::before,.match3::before,.match4::before{
+    content: "";
+    display: block;
+    width: 68px; /* عرض الـ div بالكامل */
+  height: 65.5px; /* طول الـ div بالكامل */
+  background-color: var(--lineColor); /* لون الخطوط */
+  
+    position: absolute;
+    top: -40%;
+    right: -38%;
+
+  
+  /* هذا هو الجزء السحري لمحاكاة الخطوط المفتوحة */
+  -webkit-mask-image: 
+    linear-gradient(to right, black var(--lineWeght), transparent var(--lineWeght)), /* قناع للعمود الأيسر (سمكه 2px) */
+    linear-gradient(to top, black var(--lineWeght), transparent var(--lineWeght));  /* قناع للصف السفلي (سمكه 2px) */
+  mask-image: 
+    linear-gradient(to right, black var(--lineWeght), transparent var(--lineWeght)),
+    linear-gradient(to top, black var(--lineWeght), transparent var(--lineWeght));
+    
+  -webkit-mask-position: 100% 0, 0 center; /* وضع الأقنعة لتلتقي */
+  mask-position: 100% 0, 0 center;
+  
+  -webkit-mask-size: var(--lineWeght) 100%, 100% var(--lineWeght); /* تحديد أحجام الأقنعة (عمودي، ثم أفقي) */
+  mask-size: var(--lineWeght) 100%, 100% var(--lineWeght);
+  
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+}
+
+.match3::before{
+    height: 157px;
+    top: -160%;
+    width: 80px;
+    right: -45%;
+}
+.match4::before{
+    height: 300px;
+    top: -350%;
+    width: 125px;
+    right: -70%;
+}
+
+.match1::after,.match2::after,.match3::after{
+    content: "";
+    display: block;
+    width: 29px;
+    height: 5px;
+    position: absolute;
+    top: 40%;
+    left: -17%;
+    background-color: white;
+}
+
+.m2{
+    top: 15%;
+}
+.m3{
+    top: 30%;
+}
+.m4{
+    top: 40%;
+}
+.m5{
+    top: 55%;
+}
+.m6{
+    top: 65%;
+}
+.m7{
+    top: 80%;
+}
+.m8{
+    top: 90%;
+}
+/* --- */
+.m9{
+    top: 10%;
+}
+.m10{
+    top: 35%;
+}
+.m11{
+    top: 60%;
+}
+.m12{
+    top: 85%;
+}
+
+/* --- */
+
+.m13{
+    top: 22.5%;
+}
+.m14{
+    top: 72.5%;
+}
+
+/* --- */
+.m15{
+    top: 47.5%;
+}

@@ -18,11 +18,11 @@
         <div class="trofy center">
             <div class="trofy1">
                 <img src="/img/1st.png" alt="">
-                <div class="name 1stName center">اسم الكلية</div>
+                <div class="name name1st center">اسم الكلية</div>
             </div>
             <div class="trofy2">
                 <img src="/img/2nd.png" alt="">
-                <div class="name 2ndName center">اسم الكلية</div>
+                <div class="name name2nd center">اسم الكلية</div>
             </div>
         </div>
 
@@ -35,6 +35,14 @@
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
-    <!-- <script src="/client.js"></script> -->
+    <script>
+        const socket = io()
+        
+        socket.emit('getwinners')
+        socket.on('getwinners', data=>{
+            document.querySelector('.name1st').innerHTML = `${data.name1}`
+            document.querySelector('.name2nd').innerHTML = `${data.name2}`
+        })
+    </script>
 </body>
 </html>

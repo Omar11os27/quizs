@@ -8,6 +8,7 @@ const db = require('./database'); // ملف الاتصال اللي سويناه
 const { error } = require('console');
 const { emit } = require('cluster');
 const { json } = require('stream/consumers');
+const { finished } = require('stream');
 
 app.use(express.static("public"));
 // هنا الربط الحقيقي لـ Socket.io مع حل مشكلة الـ CORS
@@ -85,8 +86,14 @@ let global = {
     noQusDatabase: false,
     matchs: [],
     teams: [],
-    curMatchId: 0
+    matchid: 0,
+    teamA: null,
+    teamB: null,
+    set: false,
+    win1st: "win1",
+    win2nd: "win2"
 }
+
 
 //functions
         
@@ -108,13 +115,16 @@ let global = {
         global.matchs = m[0]
         let t = await getTeams()
         global.teams = t[0]
+        console.log('set done!!')
     }
 
-    // setMT()
+    setMT()
 
     function getMatch(){
         let matchs = global.matchs
-        let cur = matchs.filter(m => m.match_status == 'pending')
+        let cur = matchs.filter(m => {
+           return m.match_status == 'pending'
+        })
         return cur
     }
 
@@ -130,26 +140,38 @@ let global = {
         }
     }
 
-    async function finishMatch(id){
-        if(id != 0){
-            await db.query(`update quiz_matches set match_status = 'finished' where id = ${id}`)
-        }
+    // async function finishMatch(id){
+    //     if(id != 0){
+    //         await db.query(`update quiz_matches set match_status = 'finished' where id = ${id}`)
+    //     }
+    // }
+    function finishMatch(id){
+        let m = global.matchs
+        m.map(m=>{
+            if(m.id == id){
+                m.match_status = 'finish'
+            }
+        })
+        m = m.filter(m =>{
+            return m.match_status != 'finish'
+        })
+        global.matchs = m
     }
 
     function curMatch() {
         let m = getMatch()
-        m = m[0]
-        
+            m = m[0]
         if(m != null){
+            global.matchid = m.id
             let t = getTeam(m.teamA_id, m.teamB_id)
             let ta = t.teamA
             let tb = t.teamB
-            global.curMatchId = m.id
             
-            return{
-                teamA: ta,
-                teamB: tb
-            }
+            global.teamA = ta
+            global.teamB = tb
+            console.log('curMatch=> ',m)
+            finishMatch(m.id) //to change match_status = 'finish'
+            
         }else{
             return null
         }
@@ -164,7 +186,72 @@ let global = {
             global.rolePlayer = '1'
         }
     }
-// 
+
+    function saveScore(id){
+        let m = global.matchs
+
+        m = m.filter(m =>{
+            return m.id == id
+        })
+        m = m[0]
+        // console.log('save =>',m)
+        if(m != null){
+            m.teamA_score = global.pointP1
+            m.teamB_score = global.pointP2
+        }
+
+    }
+
+    function lossTeam(id){
+        let m = global.matchs
+
+        m = m.filter(m =>{
+            return m.id == id
+        })
+        m = m[0]
+        let scoreA = 0
+        let scoreB = 0
+        if(m != null){
+            scoreA = m.teamA_score
+            scoreB = m.teamB_score
+        }
+        
+        // console.log(m)
+        if(scoreA > scoreB){
+            return m.teamB_id
+        }else if(scoreA < scoreB){
+            return m.teamA_id
+        }else{
+            console.log('TIE')
+        }
+    }
+    function updateLottery(lossTeamid){
+        let matchs = global.matchs
+        let newMatchs = matchs.filter(m =>{
+            return m.teamA_id != lossTeamid && m.teamB_id != lossTeamid
+        })
+        // console.log(newMatchs)
+        global.matchs = newMatchs
+    }
+
+    // setMT()
+    // setTimeout(()=>{
+        // console.log("before=> ",global.matchs)
+        // curMatch()
+        // curMatch()
+        // console.log("after=> ",global.matchs)
+            
+            // updateLottery(lossTeam(global.matchid)) 
+
+        // console.log('-----------------')
+        // for(let i=0;i<3;i++){
+        //     let id = curMatch()
+        //     updateLottery(lossTeam(id))
+        //     console.log("after=> ",global.matchs)
+        // }
+        // if(global.matchs.length == 0){console.log('end game')}
+    // },1000)
+
 
 
 io.on('connection', (socket)=>{
@@ -267,12 +354,17 @@ io.on('connection', (socket)=>{
         return await question
     }
     
-    
 
+    
+    socket.on('getTeam', ()=>{
+        io.emit('getTeam', {teamA: global.teamA, teamB: global.teamB, role: global.rolePlayer})
+    })
 
     socket.on('newMatch', ()=>{
-        // if(!global.isMatch){
+        if(!global.isMatch){
             console.log('new match')
+            updateLottery(lossTeam(global.matchid)) 
+            curMatch()
             global.pointP1 = 0
             global.pointP2 = 0
             global.curQus = 0
@@ -280,15 +372,26 @@ io.on('connection', (socket)=>{
             global.question = []
             global.qusFull = false
             global.enoughQus = false
-            // global.isMatch = true
+            global.isMatch = true
             io.emit('newMatch')
-        // }
+        }else{
+            console.log('match in running!!')
+        }
     })
 
-    // socket.on('endMatch', ()=>{
-    //     global.isMatch = false
-    //     // io.emit('endMatch')
-    // })
+    socket.on('endMatch', ()=>{
+        if(global.matchs.length == 0){
+            console.log('endGAme!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
+            io.emit('end')
+        }
+
+        saveScore(global.matchid)
+        global.isMatch = false
+    })
+
+    socket.on('endgame', ()=>{
+        io.emit('endgame')
+    })
 
     socket.on('changeRole', ()=>{
         changeRole()
@@ -297,6 +400,7 @@ io.on('connection', (socket)=>{
         
     // Timer
     socket.on('timer',async ()=>{
+        
         io.emit('showRole', {role : global.rolePlayer})
 
         global.timer = true
@@ -309,10 +413,7 @@ io.on('connection', (socket)=>{
             global.currectOption = question.correctId
         }
 
-        let cur = curMatch()
-        io.emit('setMatch',{teamA: cur.teamA, teamB: cur.teamB})
-
-        time = 10 //timer value
+        time = 15 //timer value
         clearInterval(timeInterval)
         io.emit('timerAnimation')
         timeInterval = setInterval(() => {
@@ -369,25 +470,32 @@ io.on('connection', (socket)=>{
         console.log('![c] client join')
     })
 
-    socket.on('disconnect', ()=>{
-        console.log('disconnect:', socket.id)
+    socket.on('getpoint', ()=>{
+        io.emit('getpoint', {pointA: global.pointP1, pointB: global.pointP2})
+    })
+    // socket.on('updateLottery', ()=>{
+        // saveScore(global.matchid)
+        // updateLottery(lossTeam(global.matchid)) 
+        // curMatch()
+    // })
+
+    socket.on('getwinners', ()=>{
+        io.emit('getwinners', {name1: global.win1st, name2: global.win2nd})
     })
 
-
-
-
-
-
-
-
+    socket.on('start', ()=>{io.emit('start')})
 
 // wait before start match
     socket.on('wait', ()=>{
-        setMT()
+        if(!global.set){
+            setMT()
+            curMatch()
+            global.set = true
+        }
+
         if(global.curQus != global.numQus){
             io.emit('wait')
         }else{
-            // finishMatch(global.curMatchId)
             io.emit('endMatch')
         }
     })
@@ -396,6 +504,14 @@ io.on('connection', (socket)=>{
     })
 
     
+
+
+
+
+
+    socket.on('disconnect', ()=>{
+        console.log('disconnect:', socket.id)
+    })
     
 })//end connection
 

@@ -36,7 +36,11 @@
     /* object-position: center center; */
 }
 .teamName{
+    /* border: 1px solid red; */
+    height: 100px;
     width: 60%;
+
+    word-spacing: 6px;
     text-align: center;
     font-size: 30px;
     margin: 20px 0;
@@ -85,6 +89,8 @@
     object-position: center top;
 }
 .mid{
+    /* border: 1px solid red; */
+
     display: flex;
     flex-direction: column;
     align-items: center;
