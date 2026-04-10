@@ -209,3 +209,19 @@
     top: -550%;
 }
 .m50{top: 48%;}
+
+
+
+
+
+
+
+
+
+/* action class */
+.winner{
+    background-color: yellow;
+}
+.loss{
+    background-color: red;
+}

@@ -354,7 +354,9 @@ io.on('connection', (socket)=>{
         return await question
     }
     
-
+    socket.on('updateLottery', ()=>{
+        io.emit('updateLottery', {teamA: true, level: 1})
+    })
     
     socket.on('getTeam', ()=>{
         io.emit('getTeam', {teamA: global.teamA, teamB: global.teamB, role: global.rolePlayer})

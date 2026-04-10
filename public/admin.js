@@ -32,7 +32,8 @@ btn2.addEventListener('click', ()=>{
 })
 
 newMatch.addEventListener('click', ()=>{
-    socket.emit('newMatch')
+    // socket.emit('newMatch')
+    socket.emit('updateLottery')
 })
 
 socket.on('lottery', (data)=>{
