@@ -92,6 +92,16 @@ let global = {
     set: false,
     win1st: "win1",
     win2nd: "win2"
+
+}
+
+let lotteryData = {
+    'm1':[""],'m2':[],'m3':[],'m4':[],'m5': "",
+    'm2Name':["","","","","","","",""],
+    'm3Name':["","","",""],
+    'm4Name':["",""],
+    'm5Name': "",
+    'level': 1,'pos': 0 
 }
 
 
@@ -355,7 +365,7 @@ io.on('connection', (socket)=>{
     }
     
     socket.on('updateLottery', ()=>{
-        io.emit('updateLottery', {teamA: true, level: 1})
+        io.emit('updateLottery', {teamA: true, teamAname: "كلية التربية للعلوم الصرفة", teamBname: "كلية علوم الحاسوب وتكنولوجيا المعلومات"})
     })
     
     socket.on('getTeam', ()=>{
@@ -475,17 +485,39 @@ io.on('connection', (socket)=>{
     socket.on('getpoint', ()=>{
         io.emit('getpoint', {pointA: global.pointP1, pointB: global.pointP2})
     })
-    // socket.on('updateLottery', ()=>{
-        // saveScore(global.matchid)
-        // updateLottery(lossTeam(global.matchid)) 
-        // curMatch()
-    // })
+    
 
     socket.on('getwinners', ()=>{
         io.emit('getwinners', {name1: global.win1st, name2: global.win2nd})
     })
 
     socket.on('start', ()=>{io.emit('start')})
+
+
+    socket.on('saveLottery', (data)=>{
+        lotteryData.m1 = data.m1
+        lotteryData.m2 = data.m2
+        lotteryData.m3 = data.m3
+        lotteryData.m4 = data.m4
+        lotteryData.m5 = data.m5
+        lotteryData.m2Name = data.m2name
+        lotteryData.m3Name = data.m3name
+        lotteryData.m4Name = data.m4name
+        lotteryData.m5Name = data.m5name
+        lotteryData.level = data.level
+        lotteryData.pos = data.pos
+        console.log(lotteryData)
+    })
+    socket.on('loadLottery',()=>{
+        io.emit('loadLottery',{
+            m1: lotteryData.m1,m2: lotteryData.m2,m3: lotteryData.m3,m4: lotteryData.m4,m5: lotteryData.m5,
+            m2name: lotteryData.m2Name,m3name: lotteryData.m3Name,m4name: lotteryData.m4Name,m5name: lotteryData.m5Name,
+            level: lotteryData.level, pos: lotteryData.pos
+        })
+    })
+
+
+
 
 // wait before start match
     socket.on('wait', ()=>{

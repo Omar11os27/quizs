@@ -178,9 +178,12 @@ window.addEventListener('load', ()=>{
         iframe.style.display = `block`
         
         //lottery after 2s from result 
-        // setTimeout(() => {
-        //     iframe.contentWindow.location.href = `lottery`
-        // }, 2000);
+        setTimeout(() => {
+            iframe.contentWindow.location.href = `lottery`
+            setTimeout(()=>{
+                socket.emit('updateLottery')
+            },1000)
+        }, 2000);
 
         socket.emit('endMatch')
     })

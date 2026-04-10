@@ -216,7 +216,24 @@
 
 
 
+.logo{
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    position: absolute;
+    top: 4%;
+    left: 0%;
+}
+.name{
+    /* border: 1px solid red; */
 
+    font-size: 20px;
+
+    position: absolute;
+    top: 12%;
+    right: 10%;
+
+}
 
 /* action class */
 .winner{
