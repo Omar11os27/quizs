@@ -9,6 +9,10 @@
     --font: white;
     --lineWeght: 5px;
     --lineColor: white;
+    --top: 3%;
+    --top2: 13%;
+    --top3: 7.8%;
+    --top4: 20.8%;
 }
 .con{
     position: relative;
@@ -70,40 +74,45 @@
     height: 100vh;
     /* border: 1px solid red; */
     position: absolute;
-    right: 15%;
+    right: 10%;
     z-index: 999;
 }
 .matchs2{   
-    right: 35%;
+    right: 29%;
 }
 
 .matchs3{
-    right: 56%;
+    right: 47%;
 }
 
 .matchs4{
-    right: 80%;
+    right: 65%;
 }
+
+.matchs5{
+    /* border: 1px solid red; */
+    right: 84%;
+}
+
 
 .match{
     width: 180px;
-    height: 40px;
+    height: 30px;
     background-color: #925353;
     border: 1px solid white;
     border-radius: 20px;
     position: absolute;
-    top: 5%;
 }
 
-.match2::before,.match3::before,.match4::before{
+.match2::before,.match3::before,.match4::before,.m50::before{
     content: "";
     display: block;
     width: 68px; /* عرض الـ div بالكامل */
-  height: 65.5px; /* طول الـ div بالكامل */
+  height: 41px; /* طول الـ div بالكامل */
   background-color: var(--lineColor); /* لون الخطوط */
   
     position: absolute;
-    top: -40%;
+    top: -24%;
     right: -38%;
 
   
@@ -126,74 +135,77 @@
 }
 
 .match3::before{
-    height: 157px;
-    top: -160%;
-    width: 80px;
-    right: -45%;
+    height: 90px;
+    top: -106%;
+    width: 53px;
+    right: -30%;
 }
 .match4::before{
-    height: 300px;
-    top: -350%;
-    width: 125px;
-    right: -70%;
+    height: 162px;
+    top: -240%;
+    width: 54px;
+    right: -30%;
 }
 
-.match1::after,.match2::after,.match3::after{
+.match1::after,.match2::after,.match3::after,.match4::after{
     content: "";
     display: block;
-    width: 29px;
+    width: 17px;
     height: 5px;
     position: absolute;
     top: 40%;
-    left: -17%;
+    left: -10%;
     background-color: white;
 }
+.m1::after,.m14::after{
+    width: 275px;
+    left: -155%;
+}
 
-.m2{
-    top: 15%;
-}
-.m3{
-    top: 30%;
-}
-.m4{
-    top: 40%;
-}
-.m5{
-    top: 55%;
-}
-.m6{
-    top: 65%;
-}
-.m7{
-    top: 80%;
-}
-.m8{
-    top: 90%;
-}
-/* --- */
-.m9{
-    top: 10%;
-}
-.m10{
-    top: 35%;
-}
-.m11{
-    top: 60%;
-}
-.m12{
-    top: 85%;
-}
+.m1{top: var(--top);}
+.m2{top: calc(var(--top) + 7%);}
+.m3{top: calc(var(--top) + 13%);}
+.m4{top: calc(var(--top) + 21%);}
+.m5{top: calc(var(--top) + 27%);}
+.m6{top: calc(var(--top) + 35%);}
+.m7{top: calc(var(--top) + 41%);}
+.m8{top: calc(var(--top) + 49%);}
+.m9{top: calc(var(--top) + 55%);}
+.m10{top: calc(var(--top) + 63%);}
+.m11{top: calc(var(--top) + 69%);}
+.m12{top: calc(var(--top) + 77%);}
+.m13{top: calc(var(--top) + 83%);}
+.m14{top: calc(var(--top) + 90%);}
 
 /* --- */
 
-.m13{
-    top: 22.5%;
-}
-.m14{
-    top: 72.5%;
-}
+.m21{top: var(--top2);}
+.m22{top: calc(var(--top2) + 14%);}
+.m23{top: calc(var(--top2) + 28%);}
+.m24{top: calc(var(--top2) + 42%);}
+.m25{top: calc(var(--top2) + 56%);}
+.m26{top: calc(var(--top2) + 70%);}
 
 /* --- */
-.m15{
-    top: 47.5%;
+.m31::before,.m34::before{
+    height: 66px;
+    top: -66%;
+    width: 53px;
+    right: -30%;
 }
+.m31{top: var(--top3);}
+.m32{top: calc(var(--top3) + 26%);}
+.m33{top: calc(var(--top3) + 54%);}
+.m34{top: calc(var(--top3) + 80.1%);}
+
+/* --- */
+.m41{top: var(--top4);}
+.m42{top: calc(var(--top4) + 54%);}
+/* -- */
+.m50::before{
+    width: 64px;
+    right: -36%;
+    height: 333px;
+    top: -550%;
+}
+.m50{top: 48%;}
