@@ -5,13 +5,13 @@
 }
 
 :root{
-    --bg: #925353;
+    --bg: #ad6262;
     --font: white;
     --lineWeght: 5px;
-    --lineColor: white;
+    --lineColor: #583232;
     --top: 3%;
     --top2: 13%;
-    --top3: 7.8%;
+    --top3: 6.5%;
     --top4: 20.8%;
 }
 .con{
@@ -21,14 +21,14 @@
     background-image: linear-gradient( to right,#D2CDCC, #A88780);
     
 }
-.side{
+/* .side{
     width: 8%;
     height: 100vh;
     z-index: 10;
     background-color: var(--bg);
     position: absolute;
     border-left: 6px solid white;
-}
+} */
 
 .shape{
     width: 100%;
@@ -74,11 +74,12 @@
     height: 100vh;
     /* border: 1px solid red; */
     position: absolute;
-    right: 10%;
+    right: 1%;
     z-index: 999;
+
 }
 .matchs2{   
-    right: 29%;
+    right: 25.5%;
 }
 
 .matchs3{
@@ -91,29 +92,33 @@
 
 .matchs5{
     /* border: 1px solid red; */
-    right: 84%;
+    right: 75%;
 }
 
 
 .match{
-    width: 180px;
-    height: 30px;
-    background-color: #925353;
-    border: 1px solid white;
+    width: 300px;
+    height: 40px;
+    background-color: var(--bg);
+    border: 4px solid #583232;
     border-radius: 20px;
     position: absolute;
+    box-shadow: 5px 15px 10px rgba(0, 0, 0, 0.35);
+
+}
+.name{
 }
 
 .match2::before,.match3::before,.match4::before,.m50::before{
     content: "";
     display: block;
-    width: 68px; /* عرض الـ div بالكامل */
-  height: 41px; /* طول الـ div بالكامل */
+    width: 30px; /* عرض الـ div بالكامل */
+  height: 45px; /* طول الـ div بالكامل */
   background-color: var(--lineColor); /* لون الخطوط */
   
     position: absolute;
-    top: -24%;
-    right: -38%;
+    top: -19%;
+    right: -11%;
 
   
   /* هذا هو الجزء السحري لمحاكاة الخطوط المفتوحة */
@@ -135,31 +140,32 @@
 }
 
 .match3::before{
-    height: 90px;
-    top: -106%;
-    width: 53px;
-    right: -30%;
+    height: 70px;
+    top: -52%;
+    width: 30px;
+    right: -11%;
 }
 .match4::before{
     height: 162px;
     top: -240%;
     width: 54px;
-    right: -30%;
+    right: -20%;
 }
 
-.match1::after,.match2::after,.match3::after,.match4::after{
+.match1::after{
     content: "";
     display: block;
-    width: 17px;
+    width: 12px;
     height: 5px;
     position: absolute;
     top: 40%;
-    left: -10%;
-    background-color: white;
+    left: -5%;
+    background-color: var(--lineColor);
 }
+
 .m1::after,.m14::after{
-    width: 275px;
-    left: -155%;
+    width: 283px;
+    left: -97.5%;
 }
 
 .m1{top: var(--top);}
@@ -188,25 +194,36 @@
 
 /* --- */
 .m31::before,.m34::before{
-    height: 66px;
-    top: -66%;
-    width: 53px;
-    right: -30%;
+    height: 60px;
+    top: -40%;
+    width: 54px;
+    right: -19%;
 }
 .m31{top: var(--top3);}
-.m32{top: calc(var(--top3) + 26%);}
-.m33{top: calc(var(--top3) + 54%);}
-.m34{top: calc(var(--top3) + 80.1%);}
+.m32{top: calc(var(--top3) + 27.5%);}
+.m33{top: calc(var(--top3) + 55%);}
+.m34{top: calc(var(--top3) + 82.5%);}
 
 /* --- */
 .m41{top: var(--top4);}
 .m42{top: calc(var(--top4) + 54%);}
+
+.m41::before,.m42::before{
+    height: 178px;
+    top: -240%;
+    width: 54px;
+    right: -19%;
+}
+.m42::before{
+    height: 178px;
+    top: -220%;
+}
 /* -- */
 .m50::before{
-    width: 64px;
-    right: -36%;
-    height: 333px;
-    top: -550%;
+    width: 40px;
+    right: -14%;
+    height: 378px;
+    top: -540%;
 }
 .m50{top: 48%;}
 
@@ -225,13 +242,19 @@
     left: 0%;
 }
 .name{
+    font-weight: bold;
+    width: 100%;
     /* border: 1px solid red; */
+    font-size: 17px;
+    font-weight: 900;
+    color: black;
 
-    font-size: 20px;
-
+    -webkit-text-stroke: 1px rgba(255, 255, 255, 0.514);
+    paint-order: stroke fill;
     position: absolute;
     top: 12%;
-    right: 10%;
+    right: 1%;
+    text-align: center;
 
 }
 

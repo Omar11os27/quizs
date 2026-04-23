@@ -21,6 +21,19 @@ window.addEventListener('load', ()=>{
         endMatch: false
     }
 
+    // audio
+    const audio = new Audio('/audio/sound1.wav');
+    function start(){
+        audio.play()
+        // console.log('sound!!')
+    }
+    function end(){
+        audio.pause()
+        audio.currentTime = 0
+        // console.log('sound end!!')
+    }
+    // audio
+    
 
     socket.emit('getTeam')
     socket.on('getTeam', (data)=>{
@@ -67,6 +80,7 @@ window.addEventListener('load', ()=>{
 
     // timer
     let time = null;
+    let isSound = false;
     socket.on('showTime', (data)=>{
         if(clientData.endMatch) return
 
@@ -74,10 +88,12 @@ window.addEventListener('load', ()=>{
         document.querySelector('.number').innerHTML = `${time}s`
         
         if(time <= 5){
+            if(!isSound){start()}
             document.querySelector('.number').style.color = `red`
             document.querySelector('.progress').style.stroke = `#770000`
         }
         if(time == 0){
+            end()
             document.querySelector('.qus').style.backgroundColor = `red`
             document.querySelector('.qus .text').innerHTML = `نفذ الوقت`
             document.querySelector('.qus .text').style.textShadow = `1px 1px 10px red`
@@ -177,15 +193,16 @@ window.addEventListener('load', ()=>{
         iframe.contentWindow.location.href = `result`
         iframe.style.display = `block`
         
+        socket.emit('endMatch')
+        
         //lottery after 2s from result 
         setTimeout(() => {
             iframe.contentWindow.location.href = `lottery`
             setTimeout(()=>{
                 socket.emit('updateLottery')
-            },1000)
+            },500)
         }, 2000);
 
-        socket.emit('endMatch')
     })
 
     // socket.on('endMatch', async()=>{
@@ -212,6 +229,14 @@ window.addEventListener('load', ()=>{
         // }, 100)
     })
 
+    // audience
+    socket.on('audience', ()=>{
+        iframe.contentWindow.location.href = `audience`
+    })
+    socket.on('returnHome', ()=>{
+        iframe.contentWindow.location.href = `lottery`
+    })
+    //
 
     // wait page before start match
     socket.on('wait', ()=>{

@@ -4,17 +4,36 @@
 const socket = io()
 
 let endgame = false
+let isMatch = false
 
 const btn = document.querySelector('.btn')
 const btn2 = document.querySelector('.btn2')
 const newMatch = document.querySelector('.newMatch')
 const start = document.querySelector('.start')
+const audience = document.querySelector('.audience')
+const audienceNext = document.querySelector('.audienceNext')
+const returnHome = document.querySelector('.returnHome')
+
+
+audience.addEventListener('click' ,()=>{
+    socket.emit('audience')
+})
+audienceNext.addEventListener('click' ,()=>{
+    socket.emit('reset')
+    socket.emit('audienceNext')
+})
+returnHome.addEventListener('click' ,()=>{
+    socket.emit('returnHome')
+})
 
 start.addEventListener('click' ,()=>{
     socket.emit('start')
 })
+//next
 btn.addEventListener('click', ()=>{
-    socket.emit('wait')
+    if(!isMatch) {
+        socket.emit('wait')
+    }
 })
 socket.on('waitFinsh', ()=>{
     socket.emit('reset')
@@ -32,8 +51,8 @@ btn2.addEventListener('click', ()=>{
 })
 
 newMatch.addEventListener('click', ()=>{
-    // socket.emit('newMatch')
-    socket.emit('updateLottery')
+    socket.emit('newMatch')
+    // socket.emit('updateLottery')
 })
 
 socket.on('lottery', (data)=>{

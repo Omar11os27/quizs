@@ -21,21 +21,28 @@
 }
 
 .trofy{
-    gap: 260px;
+    gap: 100px;
 }
 .trofy1,.trofy2{
-    width: 300px;
+    /* border: 1px solid blue; */
+    width: 500px;
     height: 300px;
-
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 .trofy img{
-    width: 100%;
+    width: 60%;
 }
 
 .name{
+    text-align: center;
+    width: 100%;
+    /* border: 1px solid red; */
     position: relative;
     z-index: 10;
-    font-size: 54px;
+    font-size: 44px;
+    line-height: 1.5;
     color: #700000;
     -webkit-text-stroke: 8px white;
     paint-order: stroke fill;

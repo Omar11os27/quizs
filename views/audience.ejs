@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/audience.css">
+    <title>Document</title>
+</head>
+<body>
+
+    <iframe src="" class="Page"></iframe>
+
+    <div class="quscon">
+
+        <div class="score">
+            
+            <h1>سؤال الجمهور</h1>
+            
+        </div>
+        
+
+        <div class="qus clip center">
+            <div class="bgqus clip center">
+                <p class="text center">السؤال</p>
+            </div>
+        </div>
+        <div class="shadowQus"></div>
+    
+        <div class="middle">
+                   <!-- <div class="time">20</div> -->
+                <div class="conTimer">
+                    <svg width="150" height="150">
+                        <circle class="timerShadow" cx="75" cy="75" r="50" stroke="#fff" stroke-width="6" fill="none" />
+                
+                        <circle cx="75" cy="75" r="45" stroke="#A88780" stroke-width="10" fill="#4A2828" />
+                
+                        <circle class="progress" cx="75" cy="75" r="45" stroke="#925353" stroke-width="10" fill="none" />
+                    </svg>
+                    <div class="number">20s</div>
+                </div>
+            <!-- end timer -->
+            
+        </div>
+        
+        <div class="ops">
+            <div class="op center clip">
+                <div class="bgop clip center">
+                    <span class="text">الخيار الاول</span>
+                </div>
+            </div>
+
+            <div class="op center clip">
+                <div class="bgop clip center">
+                    <span class="text">الخيار الثاني</span>
+                </div>
+            </div>
+
+            <div class="op center clip">
+                <div class="bgop clip center">
+                    <span class="text">الخيار الثالث</span>
+                </div>
+            </div>
+            
+            <div class="op center clip">
+                <div class="bgop clip center">
+                    <span class="text">الخيار الرابع</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bgShape"><img src="/img/bgShape.png" alt="bgShape"></div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/audience.js"></script>
+</body>
+</html>
